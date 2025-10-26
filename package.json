@@ -1,0 +1,19 @@
+{
+  "name": "jarvis-do-mago",
+  "version": "1.0.0",
+  "description": "Criado para facilitar e viabilizar o uso do projeto baileys.",
+  "license": "MIT",
+  "author": "Mago Programador",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "@cacheable/node-cache": "^1.7.4",
+    "baileys": "^7.0.0-rc.6",
+    "mime-types": "^3.0.1",
+    "pino": "^10.1.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
