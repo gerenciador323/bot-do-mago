@@ -1,0 +1,23 @@
+<%- include('layout', { body: `
+<h2>Dashboard</h2>
+<div class="row">
+  <div>
+    <h3>Agentes</h3>
+    <table>
+      <thead><tr><th>Nome</th><th>Código</th><th>Ativo</th></tr></thead>
+      <tbody>
+        ${agents.map(a => `<tr><td>${a.name}</td><td>${a.code||''}</td><td>${a.active? 'sim':'não'}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <h3>Provedores</h3>
+    <table>
+      <thead><tr><th>Nome</th><th>Base URL</th><th>Status</th></tr></thead>
+      <tbody>
+        ${providers.map(p => `<tr><td>${p.name}</td><td>${p.base_url||''}</td><td>${p.status||''}</td></tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>
+` }) %>

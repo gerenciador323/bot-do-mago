@@ -1,0 +1,18 @@
+<%- include('layout', { body: `
+<h2>Provedores LLM</h2>
+<form method="post" action="/providers">
+  <input name="name" placeholder="Nome" required>
+  <input name="base_url" placeholder="Base URL">
+  <input name="api_key" placeholder="API Key">
+  <input name="description" placeholder="Descrição">
+  <button type="submit">Adicionar</button>
+</form>
+
+<h3>Lista</h3>
+<table>
+  <thead><tr><th>Nome</th><th>Base URL</th><th>Ativo</th></tr></thead>
+  <tbody>
+    ${providers.map(p => `<tr><td>${p.name}</td><td>${p.base_url||''}</td><td>${p.active? 'sim':'não'}</td></tr>`).join('')}
+  </tbody>
+</table>
+` }) %>

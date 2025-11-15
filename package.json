@@ -7,12 +7,15 @@
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "start:web": "node src/web/server.js"
   },
   "dependencies": {
     "@cacheable/node-cache": "^1.7.4",
     "baileys": "^7.0.0-rc.6",
     "better-sqlite3": "^12.4.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
     "mime-types": "^3.0.1",
     "pino": "^10.1.0",
     "qrcode-terminal": "^0.12.0"
