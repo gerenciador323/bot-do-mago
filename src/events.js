@@ -17,7 +17,7 @@ const { processResponse } = require("./utils/waitMessage");
 // debugar eventos
 const { eventsAudit } = require("./utils/auditEvents");
 
-function eventsConfig(sock, saveCreds) {
+function eventsConfig(sock, saveCreds, onStatus) {
   // eventsAudit(sock);
 
   sock.ev.on("creds.update", saveCreds);
@@ -94,7 +94,20 @@ function eventsConfig(sock, saveCreds) {
   sock.ev.on("connection.update", async (update) => {
     const { connection, lastDisconnect, qr } = update;
 
-    if (qr) qrcode.generate(qr, { small: true });
+    if (typeof onStatus === "function" && typeof connection !== "undefined") {
+      onStatus({ connection });
+    }
+
+    if (qr) {
+      qrcode.generate(qr, { small: true });
+      if (typeof onStatus === "function") {
+        try {
+          qrcode.generate(qr, { small: true }, (ascii) => onStatus({ qr, qrAscii: ascii }));
+        } catch (_) {
+          onStatus({ qr });
+        }
+      }
+    }
 
     if (connection === "close") {
       // auditoria de desconexão
@@ -122,6 +135,7 @@ function eventsConfig(sock, saveCreds) {
 
     if (connection === "open") {
       console.log("✅ Conectado ao WhatsApp!");
+      if (typeof onStatus === "function") onStatus({ connection });
     }
   });
 }
