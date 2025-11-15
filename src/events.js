@@ -24,8 +24,8 @@ function eventsConfig(sock, saveCreds, onStatus) {
   sock.ev.on("creds.update", async () => {
     await saveCreds();
     try {
-      const sessionDir = path.join(raiz, "sessions", "jarvis-do-mago");
-      const dbPath = path.join(raiz, "sessions", "jarvis-do-mago.db");
+      const sessionDir = path.join(raiz, "sessions", "alfred-do-mago");
+      const dbPath = path.join(raiz, "sessions", "alfred-do-mago.db");
       backupSessionsToSqlite(sessionDir, dbPath);
     } catch (_) {}
   });
@@ -68,7 +68,7 @@ function eventsConfig(sock, saveCreds, onStatus) {
 
         // condicionais
         switch (text) {
-          case "jarvis":
+          case "alfred":
             await sock.sendMessage(from, {
               text: "Olá senhor, estou aqui para servi-lo.",
             });
