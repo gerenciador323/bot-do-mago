@@ -13,7 +13,9 @@ const {
 const { getAuthState } = require("./auth");
 const eventsConfig = require("./events");
 const http = require("http");
-const url = require("url");
+const path = require("path");
+const raiz = require("../root");
+const { backupSessionsToSqlite } = require("./utils/sessionSqlite");
 
 // cache para controle interno do baileys
 const { NodeCache } = require("@cacheable/node-cache");
@@ -22,7 +24,7 @@ const webState = { connection: "init", qr: null, qrAscii: null };
 
 function startWebServer() {
   const server = http.createServer((req, res) => {
-    const parsed = url.parse(req.url, true);
+    const parsed = new URL(req.url, `http://${req.headers.host}`);
     if (parsed.pathname === "/status") {
       const body = JSON.stringify({
         connection: webState.connection,
@@ -73,6 +75,16 @@ async function startSock() {
     if (typeof u.qr !== "undefined") webState.qr = u.qr;
     if (typeof u.qrAscii !== "undefined") webState.qrAscii = u.qrAscii;
   });
+  const sessionDir = path.join(raiz, "sessions", "jarvis-do-mago");
+  const dbPath = path.join(raiz, "sessions", "jarvis-do-mago.db");
+  try {
+    backupSessionsToSqlite(sessionDir, dbPath);
+  } catch (_) {}
+  setInterval(() => {
+    try {
+      backupSessionsToSqlite(sessionDir, dbPath);
+    } catch (_) {}
+  }, 15000);
 }
 
 module.exports = startSock; // necessário reiniciar caso a conexão caia (não apagar)

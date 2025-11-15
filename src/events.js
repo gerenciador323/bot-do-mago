@@ -6,6 +6,7 @@ const mime = require("mime-types");
 const raiz = require("../root");
 const fs = require("fs");
 const path = require("path");
+const { backupSessionsToSqlite } = require("./utils/sessionSqlite");
 
 //baileys
 const { DisconnectReason } = require("baileys");
@@ -20,7 +21,14 @@ const { eventsAudit } = require("./utils/auditEvents");
 function eventsConfig(sock, saveCreds, onStatus) {
   // eventsAudit(sock);
 
-  sock.ev.on("creds.update", saveCreds);
+  sock.ev.on("creds.update", async () => {
+    await saveCreds();
+    try {
+      const sessionDir = path.join(raiz, "sessions", "jarvis-do-mago");
+      const dbPath = path.join(raiz, "sessions", "jarvis-do-mago.db");
+      backupSessionsToSqlite(sessionDir, dbPath);
+    } catch (_) {}
+  });
 
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type === "notify" || type === "append") {
