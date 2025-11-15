@@ -17,7 +17,7 @@
 <table>
   <thead><tr><th>Nome</th><th>Papel</th><th>Provedor</th></tr></thead>
   <tbody>
-    ${agents.map(a => `<tr><td>${a.name}</td><td>${a.role||''}</td><td>${a.provider||''}</td></tr>`).join('')}
+    ${agents.map(a => `<tr><td><a href="/agents/${a.id}">${a.name}</a></td><td>${a.role||''}</td><td>${a.provider||''}</td></tr>`).join('')}
   </tbody>
 </table>
 

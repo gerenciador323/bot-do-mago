@@ -1,0 +1,32 @@
+<%- include('layout', { body: `
+${!agent ? '<p>Agente não encontrado</p>' : `
+<h2>${agent.name}</h2>
+<p>${agent.description||''}</p>
+<form method="post" action="/agents/${agent.id}/update">
+  <input name="provider" value="${agent.provider||''}" placeholder="Provedor e modelo (ex: openrouter:openai/gpt-oss-20b:free)">
+  <button type="submit">Salvar</button>
+</form>
+
+<h3>Executar</h3>
+<form method="post" action="/agents/${agent.id}/run">
+  <input name="text" placeholder="Digite sua mensagem" required>
+  <button type="submit">Enviar</button>
+</form>
+
+<h3>Ferramentas</h3>
+<ul>
+${tools.map(t => `<li>
+<b>${t.name}</b> ${t.tool_type||''}<br>
+<form method="post" action="/agents/${agent.id}/tools/${t.id}/exec">
+  <input name="input" placeholder="Entrada para a ferramenta">
+  <button type="submit">Executar</button>
+</form>
+</li>`).join('')}
+</ul>
+`}
+
+${result ? (result.error ? `<p>Erro: ${result.error}</p>` : `
+<h3>Resultado</h3>
+<pre>${typeof result === 'string' ? result : JSON.stringify(result, null, 2)}</pre>
+`) : ''}
+` }) %>

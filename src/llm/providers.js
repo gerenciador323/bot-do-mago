@@ -1,8 +1,6 @@
-const fetch = require("node-fetch");
-
 async function callOpenRouter({ base_url, api_key, model, messages }) {
   const url = (base_url || "https://openrouter.ai/api/v1") + "/chat/completions";
-  const res = await fetch(url, {
+  const res = await globalThis.fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${api_key}`,
@@ -17,7 +15,7 @@ async function callOpenRouter({ base_url, api_key, model, messages }) {
 
 async function callOpenAI({ base_url, api_key, model, messages }) {
   const url = (base_url || "https://api.openai.com/v1") + "/chat/completions";
-  const res = await fetch(url, {
+  const res = await globalThis.fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${api_key}`,
@@ -38,7 +36,7 @@ async function callAnthropic({ base_url, api_key, model, messages }) {
   const system = messages.find((m) => m.role === "system")?.content;
   const body = { model, max_tokens: 1024, messages: [{ role: "user", content }] };
   if (system) body.system = system;
-  const res = await fetch(url, {
+  const res = await globalThis.fetch(url, {
     method: "POST",
     headers: {
       "x-api-key": api_key,

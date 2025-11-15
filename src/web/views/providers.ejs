@@ -10,9 +10,9 @@
 
 <h3>Lista</h3>
 <table>
-  <thead><tr><th>Nome</th><th>Base URL</th><th>Ativo</th></tr></thead>
+  <thead><tr><th>Nome</th><th>Base URL</th><th>Ativo</th><th>Ações</th></tr></thead>
   <tbody>
-    ${providers.map(p => `<tr><td>${p.name}</td><td>${p.base_url||''}</td><td>${p.active? 'sim':'não'}</td></tr>`).join('')}
+    ${providers.map(p => `<tr><td>${p.name}</td><td>${p.base_url||''}</td><td>${p.active? 'sim':'não'}</td><td><a href="/providers/${p.id}">Editar</a></td></tr>`).join('')}
   </tbody>
 </table>
 ` }) %>

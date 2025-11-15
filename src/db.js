@@ -54,6 +54,14 @@ function getAgentByNameCode(name, code) {
   return db.prepare("SELECT * FROM agents WHERE name=? AND COALESCE(code,'')=COALESCE(?, '')").get(name, code || null);
 }
 
+function getAgentById(id) {
+  return db.prepare("SELECT * FROM agents WHERE id=?").get(id);
+}
+
+function updateAgentProvider(id, provider) {
+  db.prepare("UPDATE agents SET provider=?, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(provider, id);
+}
+
 function listProviders() {
   return db.prepare("SELECT * FROM providers ORDER BY id DESC").all();
 }
@@ -76,6 +84,36 @@ function createProvider(p) {
 
 function getProviderByName(name) {
   return db.prepare("SELECT * FROM providers WHERE name=?").get(name);
+}
+
+function getProviderById(id) {
+  return db.prepare("SELECT * FROM providers WHERE id=?").get(id);
+}
+
+function updateProvider(id, fields) {
+  const row = getProviderById(id);
+  if (!row) return;
+  const data = {
+    name: fields.name ?? row.name,
+    base_url: fields.base_url ?? row.base_url,
+    api_key: fields.api_key ?? row.api_key,
+    description: fields.description ?? row.description,
+    active: typeof fields.active === "boolean" ? (fields.active ? 1 : 0) : row.active,
+    status: fields.status ?? row.status,
+    config: fields.config ?? row.config,
+  };
+  db.prepare(
+    "UPDATE providers SET name=?, base_url=?, api_key=?, description=?, active=?, status=?, config=?, updated_at=CURRENT_TIMESTAMP WHERE id=?"
+  ).run(
+    data.name,
+    data.base_url,
+    data.api_key,
+    data.description,
+    data.active,
+    data.status,
+    data.config,
+    id
+  );
 }
 
 function listToolsForAgent(agentId) {
@@ -126,9 +164,13 @@ module.exports = {
   listAgents,
   createAgent,
   getAgentByNameCode,
+  getAgentById,
+  updateAgentProvider,
   listProviders,
   createProvider,
   getProviderByName,
+  getProviderById,
+  updateProvider,
   listToolsForAgent,
   createTool,
   getToolByName,

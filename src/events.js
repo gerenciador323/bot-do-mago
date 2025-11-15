@@ -13,6 +13,8 @@ const { DisconnectReason } = require("baileys");
 // configurações
 const processedMessages = new Set();
 const { processResponse } = require("./utils/waitMessage");
+const { db } = require("./db");
+const { runAgent } = require("./agents/runner");
 
 // debugar eventos
 const { eventsAudit } = require("./utils/auditEvents");
@@ -58,7 +60,6 @@ function eventsConfig(sock, saveCreds) {
         const resolveu = processResponse(from, idUnico, text);
         if (resolveu) continue;
 
-        // condicionais
         switch (text) {
           case "jarvis":
             await sock.sendMessage(from, {
@@ -85,6 +86,35 @@ function eventsConfig(sock, saveCreds) {
               caption: `aqui está seu documento senhor`,
             });
             break;
+        }
+
+        if (text.startsWith("usar agente ")) {
+          const nome = text.replace("usar agente ", "").trim();
+          db.exec("UPDATE agents SET active=0");
+          db.prepare("UPDATE agents SET active=1 WHERE name=?").run(nome);
+          await sock.sendMessage(from, { text: `Agente ativo: ${nome}` });
+          continue;
+        }
+
+        if (text.startsWith("agente ")) {
+          const rest = text.replace("agente ", "");
+          const [nome, ...p] = rest.split(":");
+          const prompt = p.join(":").trim();
+          const agent = db
+            .prepare("SELECT id FROM agents WHERE name=?")
+            .get(nome.trim());
+          if (agent) {
+            const r = await runAgent(agent.id, prompt);
+            await sock.sendMessage(from, { text: r.answer || "" });
+            continue;
+          }
+        }
+
+        const active = db.prepare("SELECT id FROM agents WHERE active=1 LIMIT 1").get();
+        if (active) {
+          const r = await runAgent(active.id, text);
+          await sock.sendMessage(from, { text: r.answer || "" });
+          continue;
         }
       }
     }

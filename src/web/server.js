@@ -5,6 +5,9 @@ const {
   createAgent,
   listProviders,
   createProvider,
+  getAgentById,
+  listToolsForAgent,
+  updateAgentProvider,
 } = require("../db");
 const { importAgentMaria, importAllFluxi } = require("../importFluxi");
 
@@ -38,6 +41,47 @@ app.post("/agents", (req, res) => {
   res.redirect("/agents");
 });
 
+app.get("/agents/:id", (req, res) => {
+  const a = getAgentById(Number(req.params.id));
+  const tools = a ? listToolsForAgent(a.id) : [];
+  res.render("agent_detail", { agent: a, tools, result: null });
+});
+
+app.post("/agents/:id/update", (req, res) => {
+  const id = Number(req.params.id);
+  const provider = req.body.provider;
+  updateAgentProvider(id, provider);
+  res.redirect(`/agents/${id}`);
+});
+
+app.post("/agents/:id/run", async (req, res) => {
+  const id = Number(req.params.id);
+  const a = getAgentById(id);
+  const tools = a ? listToolsForAgent(a.id) : [];
+  try {
+    const { runAgent } = require("../agents/runner");
+    const r = await runAgent(id, req.body.text);
+    res.render("agent_detail", { agent: a, tools, result: r });
+  } catch (e) {
+    res.render("agent_detail", { agent: a, tools, result: { error: String(e.message || e) } });
+  }
+});
+
+app.post("/agents/:id/tools/:toolId/exec", async (req, res) => {
+  const id = Number(req.params.id);
+  const toolId = Number(req.params.toolId);
+  const a = getAgentById(id);
+  const tools = a ? listToolsForAgent(a.id) : [];
+  const tool = tools.find((t) => t.id === toolId);
+  try {
+    const { executeTool } = require("../tools/executor");
+    const r = tool ? await executeTool(tool, req.body.input) : { error: "tool not found" };
+    res.render("agent_detail", { agent: a, tools, result: r });
+  } catch (e) {
+    res.render("agent_detail", { agent: a, tools, result: { error: String(e.message || e) } });
+  }
+});
+
 app.get("/providers", (req, res) => {
   res.render("providers", { providers: listProviders() });
 });
@@ -52,6 +96,23 @@ app.post("/providers", (req, res) => {
     status: "ativo",
   });
   res.redirect("/providers");
+});
+
+app.get("/providers/:id", (req, res) => {
+  const { getProviderById } = require("../db");
+  const p = getProviderById(Number(req.params.id));
+  res.render("provider_detail", { provider: p });
+});
+
+app.post("/providers/:id/update", (req, res) => {
+  const { updateProvider } = require("../db");
+  const id = Number(req.params.id);
+  updateProvider(id, {
+    base_url: req.body.base_url,
+    api_key: req.body.api_key,
+    description: req.body.description,
+  });
+  res.redirect(`/providers/${id}`);
 });
 
 app.get("/library", (req, res) => {

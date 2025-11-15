@@ -1,0 +1,11 @@
+<%- include('layout', { body: `
+${!provider ? '<p>Provedor não encontrado</p>' : `
+<h2>${provider.name}</h2>
+<form method="post" action="/providers/${provider.id}/update">
+  <input name="base_url" value="${provider.base_url||''}" placeholder="Base URL">
+  <input name="api_key" value="${provider.api_key||''}" placeholder="API Key">
+  <input name="description" value="${provider.description||''}" placeholder="Descrição">
+  <button type="submit">Salvar</button>
+</form>
+`}
+` }) %>
