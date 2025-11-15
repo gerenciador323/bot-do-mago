@@ -26,6 +26,7 @@ db.exec(
 db.exec(
   "CREATE TABLE IF NOT EXISTS providers (id INTEGER PRIMARY KEY, name TEXT NOT NULL, base_url TEXT, api_key TEXT, description TEXT, active INTEGER, status TEXT, config TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME)"
 );
+try { db.exec("ALTER TABLE providers ADD COLUMN is_default INTEGER"); } catch (e) {}
 
 function listAgents() {
   return db.prepare("SELECT * FROM agents ORDER BY id DESC").all();
@@ -159,6 +160,24 @@ function linkAgentTool(agentId, toolId) {
   ).run(agentId, toolId);
 }
 
+function setDefaultProvider(id) {
+  db.exec("UPDATE providers SET is_default=0");
+  db.prepare("UPDATE providers SET is_default=1, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(id);
+}
+
+function getDefaultProvider() {
+  return db.prepare("SELECT * FROM providers WHERE is_default=1 LIMIT 1").get();
+}
+
+function setActiveAgent(id) {
+  db.exec("UPDATE agents SET active=0");
+  db.prepare("UPDATE agents SET active=1, updated_at=CURRENT_TIMESTAMP WHERE id=?").run(id);
+}
+
+function getActiveAgent() {
+  return db.prepare("SELECT * FROM agents WHERE active=1 LIMIT 1").get();
+}
+
 module.exports = {
   db,
   listAgents,
@@ -171,8 +190,12 @@ module.exports = {
   getProviderByName,
   getProviderById,
   updateProvider,
+  setDefaultProvider,
+  getDefaultProvider,
   listToolsForAgent,
   createTool,
   getToolByName,
   linkAgentTool,
+  setActiveAgent,
+  getActiveAgent,
 };

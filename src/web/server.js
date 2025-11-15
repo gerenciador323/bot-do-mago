@@ -8,6 +8,8 @@ const {
   getAgentById,
   listToolsForAgent,
   updateAgentProvider,
+  setDefaultProvider,
+  setActiveAgent,
 } = require("../db");
 const { importAgentMaria, importAllFluxi } = require("../importFluxi");
 
@@ -82,6 +84,12 @@ app.post("/agents/:id/tools/:toolId/exec", async (req, res) => {
   }
 });
 
+app.post("/agents/:id/default", (req, res) => {
+  const id = Number(req.params.id);
+  setActiveAgent(id);
+  res.redirect(`/agents/${id}`);
+});
+
 app.get("/providers", (req, res) => {
   res.render("providers", { providers: listProviders() });
 });
@@ -112,6 +120,12 @@ app.post("/providers/:id/update", (req, res) => {
     api_key: req.body.api_key,
     description: req.body.description,
   });
+  res.redirect(`/providers/${id}`);
+});
+
+app.post("/providers/:id/default", (req, res) => {
+  const id = Number(req.params.id);
+  setDefaultProvider(id);
   res.redirect(`/providers/${id}`);
 });
 

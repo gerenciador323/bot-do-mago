@@ -1,4 +1,4 @@
-const { db, getProviderByName, listToolsForAgent } = require("../db");
+const { db, getProviderByName, getDefaultProvider, listToolsForAgent } = require("../db");
 const { callLLM } = require("../llm/providers");
 
 function getAgentById(id) {
@@ -22,12 +22,14 @@ async function runAgent(agentId, inputText) {
   const a = getAgentById(agentId);
   if (!a) throw new Error("Agente não encontrado");
   const systemPrompt = buildSystemPrompt(a);
-  const provider = getProviderByName((a.provider || "openrouter").split(":")[0]) || {
+  const namePart = (a.provider || "").split(":")[0];
+  const modelPart = (a.provider || "").split(":").slice(1).join(":");
+  const provider = getProviderByName(namePart) || getDefaultProvider() || {
     name: "openrouter",
     base_url: "https://openrouter.ai/api/v1",
     api_key: process.env.OPENROUTER_API_KEY || "",
   };
-  const model = (a.provider || "openrouter")
+  const model = modelPart || "openai/gpt-oss-20b:free";
     .split(":")
     .slice(1)
     .join(":") || "openai/gpt-oss-20b:free";

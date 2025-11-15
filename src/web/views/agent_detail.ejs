@@ -13,6 +13,10 @@ ${!agent ? '<p>Agente não encontrado</p>' : `
   <button type="submit">Enviar</button>
 </form>
 
+<form method="post" action="/agents/${agent.id}/default">
+  <button type="submit">Definir como agente padrão</button>
+</form>
+
 <h3>Ferramentas</h3>
 <ul>
 ${tools.map(t => `<li>
