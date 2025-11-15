@@ -12,6 +12,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", (req, res) => {
   res.render("index", { agents: listAgents(), providers: listProviders() });
@@ -74,6 +75,21 @@ app.post("/import/full", (req, res) => {
     res.render("library", { result: r });
   } catch (e) {
     res.status(500).send(String(e.message || e));
+  }
+});
+
+app.get("/run", (req, res) => {
+  res.render("run", { agents: listAgents(), result: null });
+});
+
+app.post("/run", async (req, res) => {
+  const { agent_id, text } = req.body;
+  try {
+    const { runAgent } = require("../agents/runner");
+    const r = await runAgent(Number(agent_id), text);
+    res.render("run", { agents: listAgents(), result: r });
+  } catch (e) {
+    res.render("run", { agents: listAgents(), result: { error: String(e.message || e) } });
   }
 });
 

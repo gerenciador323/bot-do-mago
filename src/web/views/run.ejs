@@ -1,0 +1,19 @@
+<%- include('layout', { body: `
+<h2>Executar Agente</h2>
+<form method="post" action="/run">
+  <select name="agent_id">
+    ${agents.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+  </select>
+  <input name="text" placeholder="Digite sua mensagem" required>
+  <button type="submit">Enviar</button>
+</form>
+
+${result ? (result.error ? `<p>Erro: ${result.error}</p>` : `
+<h3>Resposta</h3>
+<pre>${result.answer}</pre>
+<h3>Ferramentas do Agente</h3>
+<ul>
+${result.tools.map(t => `<li>${t.name} (${t.tool_type||''})</li>`).join('')}
+</ul>
+`) : ''}
+` }) %>
